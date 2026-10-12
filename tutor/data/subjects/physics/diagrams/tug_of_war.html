@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Force: tug of war</title>
+<style>
+body{margin:0;font-family:system-ui,Segoe UI,sans-serif;background:#fff;color:#1a1a1a;display:flex;flex-direction:column;align-items:center}
+h1{font-size:30px;margin:18px 16px 4px}
+svg{width:min(96vw,900px);height:auto}
+p{font-size:24px;margin:6px 16px;text-align:center}
+.close{font-size:20px;color:#444;margin:14px 16px 24px;padding:8px 16px;border:2px solid #444;border-radius:8px}
+text{font-family:system-ui,Segoe UI,sans-serif;font-size:24px;fill:#1a1a1a}
+.big{font-size:28px;font-weight:bold}
+</style></head><body>
+<h1>Force: tug of war</h1>
+<svg viewBox="0 0 800 330" role="img" aria-label="A rope pulled 30 newtons left and 20 newtons right, with a short blue arrow for the 10 newton net force to the left">
+<defs>
+<marker id="red" markerUnits="userSpaceOnUse" markerWidth="24" markerHeight="20" refX="22" refY="10" orient="auto"><path d="M0,0 L24,10 L0,20 z" fill="#c0392b"/></marker>
+<marker id="grn" markerUnits="userSpaceOnUse" markerWidth="24" markerHeight="20" refX="22" refY="10" orient="auto"><path d="M0,0 L24,10 L0,20 z" fill="#1e8449"/></marker>
+<marker id="blu" markerUnits="userSpaceOnUse" markerWidth="24" markerHeight="20" refX="22" refY="10" orient="auto"><path d="M0,0 L24,10 L0,20 z" fill="#1f4e9c"/></marker>
+</defs>
+<line x1="150" y1="150" x2="650" y2="150" stroke="#8d6e63" stroke-width="12" stroke-linecap="round"/>
+<circle cx="400" cy="150" r="14" fill="#1a1a1a"/>
+<line x1="400" y1="150" x2="255" y2="150" stroke="#c0392b" stroke-width="7" marker-end="url(#red)"/>
+<text x="325" y="118" text-anchor="middle">30 N</text>
+<line x1="400" y1="150" x2="495" y2="150" stroke="#c0392b" stroke-width="7" marker-end="url(#red)"/>
+<text x="450" y="118" text-anchor="middle">20 N</text>
+<text x="150" y="205" text-anchor="start">pulls left</text>
+<text x="650" y="205" text-anchor="end">pulls right</text>
+<line x1="400" y1="250" x2="345" y2="250" stroke="#1f4e9c" stroke-width="10" marker-end="url(#blu)"/>
+<text x="400" y="300" text-anchor="middle" class="big">net force = 30 − 20 = 10 N to the left</text>
+</svg>
+<p>Longer arrow means a bigger force. Subtract opposite forces to get the net force.</p>
+<p class="close">Done looking? Click the X in the corner to close this window, then go back to the chat.</p>
+</body></html>

@@ -1,0 +1,13 @@
+# Family defaults. A child's profile in children/ overrides any of these.
+age = 10
+pronouns = ["he", "him", "his"]   # subject, object, possessive
+reading_level = "about grade 5"
+bridges = "soccer, cooking and everyday objects"
+subject = "physics"               # a folder name in subjects/ (yours first, then the built-in ones)
+adjacent_per_session = 3          # nearby-science questions answered per session
+adjacent_per_week = 7             # and per ISO week (Monday start)
+
+# Turn on the S score in `tutor review`, where S = (m/m0)^2 + (c/c0)^2:
+#   m = minutes per week the child chose to study, c = lessons mastered per week.
+# target_minutes_per_week = 60
+# target_concepts_per_week = 3

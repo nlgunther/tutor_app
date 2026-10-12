@@ -1,0 +1,13 @@
+title = "introductory high-school physics"
+scope_in = "Introductory high-school physics, including the math needed"
+adjacent_examples = "why the sky is blue, how plants grow"
+greeting = "Hello! I'm Claude and I'd like to explore some of the science of physics with you. Would you like to learn about Newton's Laws of Motion?"
+bridge_map = [
+  "teleport or portal → reference frames and how fast things move",
+  "cheats or exploits → how a game's physics engine works",
+  "free items → energy and where it goes in a bounce",
+  "obstacle courses → friction, momentum and designing a course that obeys physics",
+]
+units = ["forces"]
+# Agreed order of the units still to be written; shown in `tutor review`.
+roadmap = ["motion and acceleration", "projectiles", "gravity", "momentum", "energy", "waves", "circuits"]

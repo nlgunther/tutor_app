@@ -1,0 +1,20 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+build/
+dist/
+venv/
+.env
+.DS_Store
+*.pyz
+# family data: never in this repo
+tutor_home/
+sandboxes/
+HIL_transcripts/
+sessions/
+codes.json
+*_codes.txt
+*.odt
