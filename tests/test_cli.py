@@ -5,6 +5,7 @@ import pytest
 
 from tutor import cli
 from tutor.codes import CODES_FILE, status, verify_and_consume
+from tutor.errors import SandboxError
 from tutor.paths import ENV_VAR, create_home
 from tutor.profiles import load_profile
 
@@ -283,7 +284,7 @@ def lived_in(run, home, sandbox, make_session, tmp_path):
     run("rehearsal", "adam", home=home)
     rehearsal = home.sandbox_dir("adam", rehearsal=True)
     make_session(rehearsal / "sessions", summary=FINISHED)
-    run("review", "adam", "--rehearsal", "--saveTranscript", home=home)
+    run("review", "adam", "--rehearsal", "--saveTranscript", "--save-session", home=home)
     return sandbox, rehearsal
 
 
@@ -357,3 +358,69 @@ def test_reset_of_a_rehearsal_that_does_not_exist_simply_creates_it(run, home, a
 
 def test_reset_of_a_missing_real_sandbox_says_how_to_create_it(run, home, adam):
     assert "tutor sandbox adam" in run("reset", "adam", "--confirm", "adam", home=home)[2]
+
+
+def _finished_rehearsal(run, home, make_session):
+    run("rehearsal", "adam", home=home)
+    rehearsal = home.sandbox_dir("adam", rehearsal=True)
+    make_session(rehearsal / "sessions", summary=FINISHED)
+    return rehearsal
+
+
+def test_reviewing_a_finished_dry_run_deletes_it_but_keeps_its_transcript(run, home, adam, make_session):
+    rehearsal = _finished_rehearsal(run, home, make_session)
+    code, out, _ = run("review", "adam", "--rehearsal", "--saveTranscript", home=home)
+    assert code == 0 and "Dry run deleted" in out and "Transcript saved" in out
+    assert not rehearsal.exists()
+    assert (home.transcripts_dir / "rehearsal" / "2026-10-11_0900_adam.md").is_file()
+
+
+def test_save_session_keeps_the_dry_run(run, home, adam, make_session):
+    rehearsal = _finished_rehearsal(run, home, make_session)
+    code, out, _ = run("review", "adam", "--rehearsal", "--save-session", home=home)
+    assert code == 0 and "Dry run kept (--save-session)" in out and rehearsal.is_dir()
+
+
+def test_an_unfinished_dry_run_is_never_auto_deleted(run, home, adam, make_session):
+    run("rehearsal", "adam", home=home)
+    rehearsal = home.sandbox_dir("adam", rehearsal=True)
+    make_session(rehearsal / "sessions")
+    out = run("review", "adam", "--rehearsal", home=home)[1]
+    assert "not ended with an exit code" in out and rehearsal.is_dir()
+
+
+def test_a_dry_run_with_no_session_is_kept(run, home, adam):
+    run("rehearsal", "adam", home=home)
+    out = run("review", "adam", "--rehearsal", home=home)[1]
+    assert "no session yet" in out and home.sandbox_dir("adam", rehearsal=True).is_dir()
+
+
+def test_save_session_without_rehearsal_is_an_error(run, home, sandbox, make_session):
+    make_session(sandbox / "sessions", summary=FINISHED)
+    code, _, err = run("review", "adam", "--save-session", home=home)
+    assert code == 1 and "only applies to a dry run" in err
+
+
+def test_a_real_review_never_deletes_the_real_sandbox(run, home, sandbox, make_session):
+    make_session(sandbox / "sessions", summary=FINISHED)
+    run("review", "adam", home=home)
+    assert sandbox.is_dir() and len(list((sandbox / "sessions").iterdir())) == 1
+
+
+def test_a_failed_auto_delete_keeps_the_digest_and_says_why(run, home, adam, make_session, monkeypatch):
+    _finished_rehearsal(run, home, make_session)
+
+    def locked(*_, **__):
+        raise SandboxError("Could not delete (locked). Close the chat and retry.")
+
+    monkeypatch.setattr("tutor.cli.delete_sandbox", locked)
+    code, out, _ = run("review", "adam", "--rehearsal", home=home)
+    assert code == 0 and "Rehearsal not deleted: Could not delete" in out and "adam" in out
+
+
+def test_deleting_an_already_auto_deleted_dry_run_clears_leftover_transcripts(run, home, adam, make_session):
+    _finished_rehearsal(run, home, make_session)
+    run("review", "adam", "--rehearsal", "--saveTranscript", home=home)
+    code, out, _ = run("delete", "adam", "--rehearsal", home=home)
+    assert code == 0 and "already deleted" in out and "Removed 1 saved" in out
+    assert not list((home.transcripts_dir / "rehearsal").iterdir())

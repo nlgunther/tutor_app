@@ -34,6 +34,7 @@ class WeekTotals:
     adjacent_used: int
     safety_flags: int
     concepts_mastered: int
+    unreliable_sessions: int = 0  # sessions whose minutes look inflated by idle time
 
 
 @dataclass(frozen=True)
@@ -79,6 +80,7 @@ def week_totals(records: tuple[SessionRecord, ...], progress: Progress, start: d
         adjacent_used=sum(r.adjacent_used for r in week),
         safety_flags=sum(len(r.safety_turns) for r in week),
         concepts_mastered=sum(1 for day in progress.mastered_on.values() if _in_week(day, start)),
+        unreliable_sessions=sum(1 for r in week if r.minutes_unreliable),
     )
 
 

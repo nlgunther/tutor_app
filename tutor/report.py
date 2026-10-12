@@ -27,10 +27,16 @@ def render_digest(
         lines.append("  No sessions recorded yet.")
     lines += _week_lines(profile, totals)
     lines += _progress_lines(subject, progress)
+    if totals.unreliable_sessions:
+        warnings.append(f"minutes for {totals.unreliable_sessions} session(s) this week look inflated by idle time; the weekly total and S are overstated")
     warnings += [f"mastered id not in the subject: {lesson_id}" for lesson_id in progress.unknown_ids]
     if warnings:
         lines += ["Warnings:"] + [f"  - {w}" for w in warnings]
     return "\n".join(lines)
+
+
+def _unreliable(record: SessionRecord) -> str:
+    return " (unreliable: the log was still being written hours after the start, so idle time is counted)" if record.minutes_unreliable else ""
 
 
 def _titled(subject: Subject, lesson_id: str) -> str:
@@ -42,7 +48,7 @@ def _session_lines(record: SessionRecord, subject: Subject, profile: ChildProfil
     ended = "with an exit code" if record.finished else "NOT with an exit code (app closed, or the code was not used)"
     lines = [
         f"Session {record.session_id}",
-        f"  Started {record.started:%Y-%m-%d %H:%M}, about {record.minutes} min; initiated by {record.initiated_by}",
+        f"  Started {record.started:%Y-%m-%d %H:%M}, about {record.minutes} min{_unreliable(record)}; initiated by {record.initiated_by}",
         f"  Ended: {ended}",
         f"  Covered: {', '.join(record.lessons_covered) or 'nothing recorded'}",
         f"  Mastered: {'; '.join(_titled(subject, i) for i in record.mastered) or 'none'}",

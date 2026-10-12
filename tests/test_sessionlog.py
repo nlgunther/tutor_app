@@ -173,3 +173,8 @@ def test_selecting_a_session_from_nothing_is_an_error():
 
     with pytest.raises(LogError, match="No sessions recorded yet"):
         select_session((), None)
+
+
+def test_a_session_logged_for_hours_has_unreliable_minutes(make_session, tmp_path):
+    assert parse(make_session, tmp_path, minutes=481).minutes_unreliable
+    assert not parse(make_session, tmp_path, minutes=180).minutes_unreliable  # the limit itself is allowed

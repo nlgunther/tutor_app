@@ -109,5 +109,6 @@ tutor_home\
 - Transcripts are written by the program from the session log, not by Claude, and contain the child's words. They live outside every sandbox. The log never holds an exit code, so neither does a transcript.
 - `--saveTranscript` works two ways: type it after the code at exit (`\endChildSession <code> --saveTranscript`; the next `tutor review` saves it), or add it to `tutor review` for any session, any time.
 - `--save-session` (note the spelling, unlike `--saveTranscript`) keeps a dry run after review and is an error without `--rehearsal`. A failed auto-delete (Windows lock) prints "Rehearsal not deleted" after the digest; close the chat and run `tutor delete CHILD --rehearsal`.
+- Minutes are the span from the first to the last write to the log, so a chat left open or reopened hours later is overstated. A session over 180 minutes is marked "unreliable" in `review`, with a warning that the weekly total and S are overstated. Rehearsals never count toward totals.
 - Rehearsal sandboxes use 5 throwaway codes, shown on screen; real codes only go to `--out FILE`.
 - `reset` and `delete` fail with a clear message if Windows has the folder open (a running chat, File Explorer). Close those and retry; nothing is half-deleted by the program's own checks.

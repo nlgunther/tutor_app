@@ -118,4 +118,4 @@ from tutor.subjects import load_subject
 
 ---
 
-*Last updated: 2026-10-12 — Think about lines (test_subjects.py) and the reply-first turn-order rule (test_package_hygiene.py); earlier: dry-run auto-delete on `review --rehearsal` with `--save-session` (test_cli.py, test_end_to_end.py); earlier: added delete/reset, the dry-run sheet, prepared pictures and Draw it diagrams (pack format, sandbox copy, hygiene checks), transcript saving (test_transcript.py, review/--saveTranscript cases), docs-drift tests and the vector lesson check.*
+*Last updated: 2026-10-12 — unreliable-minutes flag (test_sessionlog.py, test_report.py); earlier: Think about lines (test_subjects.py) and the reply-first turn-order rule (test_package_hygiene.py); earlier: dry-run auto-delete on `review --rehearsal` with `--save-session` (test_cli.py, test_end_to_end.py); earlier: added delete/reset, the dry-run sheet, prepared pictures and Draw it diagrams (pack format, sandbox copy, hygiene checks), transcript saving (test_transcript.py, review/--saveTranscript cases), docs-drift tests and the vector lesson check.*

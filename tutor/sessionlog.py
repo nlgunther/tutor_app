@@ -30,6 +30,9 @@ SESSION_FILE = re.compile(r"^(\d{4}-\d{2}-\d{2})_(\d{4})_([a-z][a-z0-9_]*)\.md$"
 LESSON_REF = re.compile(r"^[a-z][a-z0-9_]*\.\d+$")
 SUMMARY_BEGIN = "<!-- summary:begin -->"
 SUMMARY_END = "<!-- summary:end -->"
+# Minutes come from file times, so a chat left open (or reopened hours later) inflates them. A real lesson
+# session is well under this; beyond it the figure is flagged rather than trusted.
+MAX_PLAUSIBLE_MINUTES = 180
 SUMMARY_KEYS = frozenset({"ended_by", "initiated_by", "mastered", "notes", "open_questions", "save_transcript"})
 INITIATORS = ("child", "parent")
 
@@ -73,6 +76,11 @@ class SessionRecord:
     @property
     def minutes(self) -> int:
         return max(0, round((self.last_activity - self.started).total_seconds() / 60))
+
+    @property
+    def minutes_unreliable(self) -> bool:
+        """True when the log was still being written long after the start, so `minutes` probably counts idle time."""
+        return self.minutes > MAX_PLAUSIBLE_MINUTES
 
     @property
     def initiated_by(self) -> str:

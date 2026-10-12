@@ -150,8 +150,9 @@ def test_a_dry_run_from_creation_to_deletion(tmp_path):
     assert pyz(rehearsal, "verify", code, cwd=tmp_path).stdout.strip() == "OK"
 
     (rehearsal / "sessions" / "2026-10-11_0900_adam.md").write_text(LOG, encoding="utf-8")
-    saved = tutor("review", "adam", "--rehearsal", "--saveTranscript", cwd=home)
+    saved = tutor("review", "adam", "--rehearsal", "--saveTranscript", "--save-session", cwd=home)
     assert saved.returncode == 0 and (home / "HIL_transcripts" / "rehearsal" / "2026-10-11_0900_adam.md").is_file()
+    assert rehearsal.is_dir() and "Dry run kept" in saved.stdout
 
     removed = tutor("delete", "adam", "--rehearsal", cwd=home)
     assert removed.returncode == 0 and not rehearsal.exists()
@@ -159,3 +160,13 @@ def test_a_dry_run_from_creation_to_deletion(tmp_path):
 
     refused = tutor("delete", "adam", cwd=home)
     assert refused.returncode == 1 and "--confirm adam" in refused.stderr and sandbox.is_dir()
+
+
+def test_a_dry_run_deletes_itself_on_review(tmp_path):
+    home, _, _ = make_home(tmp_path)
+    tutor("rehearsal", "adam", cwd=home)
+    rehearsal = home / "sandboxes" / "adam-rehearsal"
+    (rehearsal / "sessions" / "2026-10-11_0900_adam.md").write_text(LOG, encoding="utf-8")
+    done = tutor("review", "adam", "--rehearsal", "--saveTranscript", cwd=home)
+    assert done.returncode == 0 and "Dry run deleted" in done.stdout and not rehearsal.exists()
+    assert (home / "HIL_transcripts" / "rehearsal" / "2026-10-11_0900_adam.md").is_file()

@@ -64,7 +64,7 @@ Upper-cases and strips spaces and dashes: `normalize("k7qf-3m9t xa2b") == "K7QF3
 
 ### parse_session(path) -> SessionRecord
 ### load_sessions(folder) -> SessionLoad
-`SessionLoad(records, unrecognised)`, oldest first. `SessionRecord` exposes `finished, minutes, initiated_by, mastered, adjacent_used, safety_turns, redirects, lessons_covered, warnings`. Minutes are the file's last-modified time minus the start time in its name.
+`SessionLoad(records, unrecognised)`, oldest first. `SessionRecord` exposes `finished, minutes, minutes_unreliable` (true above `MAX_PLAUSIBLE_MINUTES` = 180: minutes come from file times, so a chat left open counts idle time), initiated_by, mastered, adjacent_used, safety_turns, redirects, lessons_covered, warnings`. Minutes are the file's last-modified time minus the start time in its name.
 
 ### select_session(records, session_id=None) -> SessionRecord
 The latest record, or the one named. Raises `LogError` when there are none or the id is unknown.

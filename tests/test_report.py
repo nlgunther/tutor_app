@@ -95,3 +95,15 @@ def test_completed_subject_message(make_session, tmp_path, adam, physics, now):
 def test_roadmap_line_is_omitted_when_the_subject_has_none(tmp_path, adam, physics, now):
     bare = dataclasses.replace(physics, roadmap=())
     assert "Roadmap" not in digest(tmp_path, adam, bare, now)
+
+
+def test_inflated_minutes_are_flagged_in_the_session_and_the_week(make_session, tmp_path, adam, physics, now):
+    make_session(tmp_path, lines=TURNS, minutes=481)
+    text = digest(tmp_path, adam, physics, now)
+    assert "about 481 min (unreliable:" in text
+    assert "minutes for 1 session(s) this week look inflated by idle time" in text
+
+
+def test_ordinary_minutes_are_not_flagged(make_session, tmp_path, adam, physics, now):
+    make_session(tmp_path, lines=TURNS, summary=SUMMARY, minutes=30)
+    assert "unreliable" not in digest(tmp_path, adam, physics, now)

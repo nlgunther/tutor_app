@@ -1,10 +1,10 @@
 # tutor file manifest
-# Generated: 2026-10-12 16:26 UTC
+# Generated: 2026-10-12 17:37 UTC
 # Format:  sha256_prefix<TAB>local_path
 # Hashes use CRLF normalisation (Windows-compatible). Documentation under docs/ is not tracked.
 # Bundle: SHA-256 of sorted file hashes concatenated (hash-of-hashes).
 #
-bundle:	ae0892777f7e5a5a466515c0
+bundle:	bb44d08af3ba3ffce9a92acc
 #
 44834dbc8f01ff82	pyproject.toml
 b4ddb9875f7cbb83	tests/conftest.py
@@ -15,10 +15,10 @@ a1554df75b6731d7	tests/test_ledger.py
 bf76ae8c36563e2b	tests/test_package_hygiene.py
 e767bd2b1e4ed3d0	tests/test_paths.py
 87aeccba81a32458	tests/test_profiles.py
-d92f679aa0397a22	tests/test_report.py
+15464a94e03fe694	tests/test_report.py
 7cf948cb1c7cbe3a	tests/test_sandbox.py
 52b467d8de5ef942	tests/test_sandbox_runtime.py
-2a0e5e053da50527	tests/test_sessionlog.py
+0fda350d56a2b002	tests/test_sessionlog.py
 56aebb447f4b45df	tests/test_subjects.py
 bfc3ebcf844bf95f	tests/test_transcript.py
 cd839c1a352fcd6c	tutor/__init__.py
@@ -36,13 +36,13 @@ bb39a4b817ece172	tutor/data/subjects/physics/units/forces.md
 41e8b1931ef82eda	tutor/data/templates/SKILL.md
 6d449c33f2aefb5d	tutor/data/templates/start_prompt.md
 b1f45742c046b088	tutor/errors.py
-c9561efaf024e718	tutor/ledger.py
+aa5ed2105593703a	tutor/ledger.py
 25df1c455305ebb6	tutor/paths.py
 d90d0018dabbc554	tutor/profiles.py
-3bb3169015fc5632	tutor/report.py
+62bf30c8a8ccce9e	tutor/report.py
 35d2d88dcd56fd23	tutor/sandbox.py
 e2e2db8b8cee3035	tutor/sandbox_runtime.py
-4dcf7e1c9407b904	tutor/sessionlog.py
+fa96dc0ba4c0b8c2	tutor/sessionlog.py
 deaee203d8e44d0e	tutor/subjects.py
 92bbc330e103fd75	tutor/transcript.py
 317ae64edf874732	verify_install.py

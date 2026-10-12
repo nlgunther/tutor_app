@@ -150,18 +150,42 @@ def _start(args, runtime: Runtime) -> str:
 
 
 def _review(args, runtime: Runtime) -> str:
+    if args.save_session and not args.rehearsal:
+        raise TutorError("--save-session only applies to a dry run; real sandboxes are never deleted by review.")
     loaded = _load(args, runtime)
     dest = require_sandbox(loaded.home, args.child, args.rehearsal)
     load = load_sessions(dest / SESSIONS_DIR)
     digest = render_digest(loaded.profile, loaded.subject, load, runtime.now, args.session)
     record = select_session(load.records, args.session) if load.records else None
     asked_in_chat = bool(record and record.summary and record.summary.save_transcript)
-    if not (args.save_transcript or asked_in_chat):
-        return digest
-    if record is None:
-        raise LogError("--saveTranscript: there is no session to save yet.")
-    saved = save_transcript(loaded.home, loaded.profile, loaded.subject, record, args.rehearsal)
-    return f"{digest}\nTranscript saved: {saved}"
+    lines = [digest]
+    if args.save_transcript or asked_in_chat:
+        if record is None:
+            raise LogError("--saveTranscript: there is no session to save yet.")
+        lines.append(f"Transcript saved: {save_transcript(loaded.home, loaded.profile, loaded.subject, record, args.rehearsal)}")
+    if args.rehearsal:
+        lines.append(_auto_delete_note(loaded.home, args, load))
+    return "\n".join(lines)
+
+
+def _auto_delete_note(home: Home, args, load) -> str:
+    """A dry run is throwaway, so reviewing a finished one deletes it unless --save-session says to keep it.
+
+    Only the sandbox goes; transcripts already saved in HIL_transcripts/rehearsal are kept. An unfinished
+    session is never deleted (the exit code was not used, so the run is not over), and a failed
+    deletion (Windows holding the folder open) becomes a note rather than losing the digest.
+    """
+    if args.save_session:
+        return f"Dry run kept (--save-session). Delete it later with: tutor delete {args.child} --rehearsal"
+    if not load.records:
+        return "Dry run kept: it has no session yet."
+    if not load.records[-1].finished:
+        return "Dry run kept: its last session was not ended with an exit code. Finish it, or run: tutor delete " + f"{args.child} --rehearsal"
+    try:
+        delete_sandbox(home, args.child, rehearsal=True)
+    except SandboxError as err:
+        return f"Rehearsal not deleted: {err}"
+    return f"Dry run deleted. Keep the next one with --save-session. Start another: tutor rehearsal {args.child}"
 
 
 def _rehearsal(args, runtime: Runtime) -> str:
@@ -195,6 +219,10 @@ def _require_confirmation(args, dest: Path, action: str) -> None:
 
 def _delete(args, runtime: Runtime) -> str:
     home = runtime.home()
+    if args.rehearsal and not home.sandbox_dir(args.child, True).exists():
+        removed = delete_rehearsal_transcripts(home, args.child)  # sandbox already auto-deleted; clear leftovers
+        if removed:
+            return f"No rehearsal sandbox for {args.child} (already deleted). Removed {removed} saved rehearsal transcript(s)."
     dest = require_sandbox(home, args.child, args.rehearsal)
     _require_confirmation(args, dest, "delete")
     delete_sandbox(home, args.child, args.rehearsal)
@@ -273,6 +301,8 @@ def _add_session_commands(commands, common) -> None:
     review.add_argument("--session", help="a session id instead of the latest")
     review.add_argument("--saveTranscript", dest="save_transcript", action="store_true",
                         help="also save a readable transcript in HIL_transcripts (done automatically when the exit command carried --saveTranscript)")
+    review.add_argument("--save-session", dest="save_session", action="store_true",
+                        help="with --rehearsal: keep the dry-run sandbox instead of deleting it after the review")
     rehearsal = commands.add_parser("rehearsal", help="set up an adult dry run for a child")
     rehearsal.set_defaults(handler=_rehearsal)
     rehearsal.add_argument("child")
