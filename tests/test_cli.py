@@ -1,4 +1,6 @@
 """Tests for tutor.cli: every command, its output, and the errors a parent can hit."""
+import os
+from datetime import datetime
 from pathlib import Path
 
 import pytest
@@ -424,3 +426,14 @@ def test_deleting_an_already_auto_deleted_dry_run_clears_leftover_transcripts(ru
     code, out, _ = run("delete", "adam", "--rehearsal", home=home)
     assert code == 0 and "already deleted" in out and "Removed 1 saved" in out
     assert not list((home.transcripts_dir / "rehearsal").iterdir())
+
+
+def test_review_warns_when_the_latest_code_was_never_marked_used(run, home, sandbox, make_session, tmp_path):
+    run("codes", "new", "adam", "--count", "2", "--out", str(tmp_path / "paper.txt"), home=home)
+    make_session(sandbox / "sessions", summary=FINISHED)  # started 2026-10-11 09:00
+    old = datetime(2026, 10, 10, 12, 0).timestamp()
+    os.utime(sandbox / CODES_FILE, (old, old))  # codes.json untouched since before the session
+    assert "may not be marked as used" in run("review", "adam", home=home)[1]
+    recent = datetime(2026, 10, 11, 9, 30).timestamp()
+    os.utime(sandbox / CODES_FILE, (recent, recent))  # a spend rewrote it during the session
+    assert "may not be marked as used" not in run("review", "adam", home=home)[1]

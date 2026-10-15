@@ -78,8 +78,8 @@ Pure functions over records: `week_start(day)`, `compute_progress(records, subje
 
 ## tutor.report
 
-### render_digest(profile, subject, load, now, session_id=None) -> str
-The text `tutor review` prints.
+### render_digest(profile, subject, load, now, session_id=None, codes_modified=None) -> str
+The text `tutor review` prints. `codes_modified` is the time `codes.json` last changed; when the latest session ended with a code but `codes.json` is older than that session, a warning says the code may not be marked as used.
 
 
 ## tutor.transcript

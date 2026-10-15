@@ -1,13 +1,13 @@
 """Shared fixtures. Every test gets a fresh home inside tmp_path; nothing touches the real filesystem.
 
-Fixtures: now, summary_ok, home, adam, physics, sandbox, make_session.
+Fixtures: no_real_tutor_home (autouse), now, summary_ok, home, adam, physics, sandbox, make_session.
 """
 import os
 from datetime import datetime, timedelta
 
 import pytest
 
-from tutor.paths import create_home
+from tutor.paths import ENV_VAR, create_home
 from tutor.profiles import add_profile
 from tutor.sandbox import render_sandbox
 from tutor.subjects import load_subject
@@ -25,6 +25,12 @@ SUMMARY_OK = (
     'notes = "Fast on acceleration."',
     'open_questions = ["why is the sky blue"]',
 )
+
+
+@pytest.fixture(autouse=True)
+def no_real_tutor_home(monkeypatch):
+    """A parent who exports TUTOR_HOME would otherwise point every command (including subprocesses) at the real home."""
+    monkeypatch.delenv(ENV_VAR, raising=False)
 
 
 @pytest.fixture

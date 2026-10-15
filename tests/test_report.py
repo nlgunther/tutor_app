@@ -1,5 +1,6 @@
 """Tests for tutor.report: what the parent's digest says in each situation."""
 import dataclasses
+from datetime import datetime
 
 import pytest
 
@@ -19,8 +20,8 @@ TURNS = [
 SUMMARY = ['ended_by = "code"', 'initiated_by = "child"', 'mastered = ["forces.0"]', 'notes = "Resume at forces.1."', 'open_questions = ["q one", "q two"]']
 
 
-def digest(folder, profile, subject, now, session_id=None):
-    return render_digest(profile, subject, load_sessions(folder), now, session_id)
+def digest(folder, profile, subject, now, session_id=None, codes_modified=None):
+    return render_digest(profile, subject, load_sessions(folder), now, session_id, codes_modified)
 
 
 def test_no_sessions_yet(tmp_path, adam, physics, now):
@@ -107,3 +108,25 @@ def test_inflated_minutes_are_flagged_in_the_session_and_the_week(make_session, 
 def test_ordinary_minutes_are_not_flagged(make_session, tmp_path, adam, physics, now):
     make_session(tmp_path, lines=TURNS, summary=SUMMARY, minutes=30)
     assert "unreliable" not in digest(tmp_path, adam, physics, now)
+
+
+def test_a_code_that_was_never_marked_used_is_warned_about(make_session, tmp_path, adam, physics, now):
+    make_session(tmp_path, lines=TURNS, summary=SUMMARY)  # started 2026-10-11 09:00
+    stale = datetime(2026, 10, 10, 12, 0)  # codes.json older than the session: nothing was spent
+    text = digest(tmp_path, adam, physics, now, codes_modified=stale)
+    assert "ended with an exit code, but codes.json has not changed since before it started" in text
+    assert "tutor codes status adam" in text
+
+
+def test_a_code_marked_used_during_the_session_gives_no_warning(make_session, tmp_path, adam, physics, now):
+    make_session(tmp_path, lines=TURNS, summary=SUMMARY)
+    assert "codes.json" not in digest(tmp_path, adam, physics, now, codes_modified=datetime(2026, 10, 11, 9, 30))
+
+
+def test_no_code_warning_without_a_finished_session_or_a_codes_file(make_session, tmp_path, adam, physics, now):
+    stale = datetime(2026, 10, 10, 12, 0)
+    assert "codes.json" not in digest(tmp_path, adam, physics, now, codes_modified=stale)  # no sessions
+    make_session(tmp_path, lines=TURNS)  # unfinished: no code was used, so nothing is owed
+    assert "codes.json" not in digest(tmp_path, adam, physics, now, codes_modified=stale)
+    make_session(tmp_path, stamp="2026-10-12_0900", lines=TURNS, summary=SUMMARY)
+    assert "codes.json" not in digest(tmp_path, adam, physics, now, codes_modified=None)

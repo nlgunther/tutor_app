@@ -12,9 +12,14 @@ from tutor.subjects import Subject
 
 
 def render_digest(
-    profile: ChildProfile, subject: Subject, load: SessionLoad, now: datetime, session_id: str | None = None
+    profile: ChildProfile, subject: Subject, load: SessionLoad, now: datetime, session_id: str | None = None,
+    codes_modified: datetime | None = None,
 ) -> str:
-    """Build the parent's text report: one session (the latest unless session_id is given), the week and progress."""
+    """Build the parent's text report: one session (the latest unless session_id is given), the week and progress.
+
+    codes_modified is the time the sandbox's codes.json last changed; with it the report can warn that the latest
+    session ended with a code that was never marked as used.
+    """
     progress = compute_progress(load.records, subject)
     totals = week_totals(load.records, progress, week_start(now.date()))
     lines = [f"Digest for {profile.name}"]
@@ -27,12 +32,26 @@ def render_digest(
         lines.append("  No sessions recorded yet.")
     lines += _week_lines(profile, totals)
     lines += _progress_lines(subject, progress)
+    if unspent := _unspent_code_warning(load, codes_modified, profile.child_id):
+        warnings.append(unspent)
     if totals.unreliable_sessions:
         warnings.append(f"minutes for {totals.unreliable_sessions} session(s) this week look inflated by idle time; the weekly total and S are overstated")
     warnings += [f"mastered id not in the subject: {lesson_id}" for lesson_id in progress.unknown_ids]
     if warnings:
         lines += ["Warnings:"] + [f"  - {w}" for w in warnings]
     return "\n".join(lines)
+
+
+def _unspent_code_warning(load: SessionLoad, codes_modified: datetime | None, child_id: str) -> str | None:
+    """A spent code rewrites codes.json, so a latest session that ended with a code while codes.json is older
+    than the session means the code was accepted but never marked as used (a missed write-back)."""
+    if codes_modified is None or not load.records:
+        return None
+    latest = load.records[-1]
+    if not latest.finished or codes_modified >= latest.started:
+        return None
+    return (f"{latest.session_id} ended with an exit code, but codes.json has not changed since before it started, "
+            f"so that code may not be marked as used. Check with: tutor codes status {child_id}")
 
 
 def _unreliable(record: SessionRecord) -> str:

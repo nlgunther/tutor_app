@@ -40,6 +40,7 @@ The child can say "draw it" for a text diagram any time. For a bigger picture th
 |---|---|
 | Lost the paper list | `tutor codes new CHILD --out ..\codes2.txt --replace` |
 | Out of codes | `tutor codes new CHILD --out FILE` |
+| `review` says a code "may not be marked as used" | Run `tutor codes status CHILD`; if the unused count did not drop, the code is still valid: replace it with `tutor codes new CHILD --out FILE --replace` when convenient |
 | `review` says a turn looks like an exit code | Delete that line from the log; `--replace` the codes |
 | Edited a profile, defaults or unit | `tutor sandbox CHILD` |
 | Start a real sandbox over (erases logs and codes) | `tutor reset CHILD --confirm CHILD`, then new codes |

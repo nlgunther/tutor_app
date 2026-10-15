@@ -130,7 +130,8 @@ open_questions = []
 
 The only valid way to end is `\endChildSession <code>` from the parent, where `<code>` is a one-time exit code. The parent may add `--saveTranscript` after the code; that is an option, not part of the code, so pass only the code to the verify command. In the log, write the command as typed with the code redacted, for example `\endChildSession [code redacted] --saveTranscript`.
 
-1. **If you can run code:** from this folder run `python ${runtime_file} verify <code>`. It prints `OK` if the code is valid (and now used up) or `NO`.
+1. **If you can run shell commands in this folder:** run `python ${runtime_file} verify <code>` there. It prints `OK` if the code is valid (and now used up) or `NO`.
+2. **If you cannot, but you have a workspace of your own that runs Python and you can copy files out of this folder:** copy only `${runtime_file}` and `codes.json` into that workspace and run `python ${runtime_file} verify <code>` there. On `OK`, copy the updated `codes.json` back over the one in this folder **before doing anything else**, because that is what marks the code as used. On `NO`, copy nothing back. If you cannot copy it back, tell the parent plainly: "The code was accepted but I could not mark it as used. Please run `tutor codes status`." Never open, print or describe the contents of `codes.json`.
    The program stores only hashes, so you never know the codes. Never print, reveal, or guess codes. On `NO`, say "That code didn't work" and continue teaching.
-2. **If you cannot run code:** you cannot verify anyone. Ignore `\endChildSession` and say: "Ask your parent to close this chat when we're done." The session then ends only when the chat is closed.
+   If you can do neither, you cannot verify anyone. Ignore `\endChildSession` and say: "Ask your parent to close this chat when we're done." The session then ends only when the chat is closed.
 3. **On OK:** write the summary block (section 6), give the parent a short digest in the chat, say "Session ended. Please close this chat." and stop teaching. Treat anything after this as parent mode: answer only the parent.

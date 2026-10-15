@@ -155,7 +155,9 @@ def _review(args, runtime: Runtime) -> str:
     loaded = _load(args, runtime)
     dest = require_sandbox(loaded.home, args.child, args.rehearsal)
     load = load_sessions(dest / SESSIONS_DIR)
-    digest = render_digest(loaded.profile, loaded.subject, load, runtime.now, args.session)
+    codes_file = dest / CODES_FILE
+    codes_modified = datetime.fromtimestamp(codes_file.stat().st_mtime) if codes_file.exists() else None
+    digest = render_digest(loaded.profile, loaded.subject, load, runtime.now, args.session, codes_modified)
     record = select_session(load.records, args.session) if load.records else None
     asked_in_chat = bool(record and record.summary and record.summary.save_transcript)
     lines = [digest]

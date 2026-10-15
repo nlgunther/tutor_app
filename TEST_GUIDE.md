@@ -30,6 +30,7 @@ tests/
 `testpaths = ["tests"]`, `pythonpath = ["."]`, `addopts = "-q"`
 **conftest.py:** `tests/conftest.py` exports the fixtures below. Run everything with `pytest`, coverage with
 `pytest --cov=tutor --cov-report=term-missing`. Expected: all pass, ~99% (the uncovered lines are entry-point stubs run only in subprocesses).
+An autouse fixture (`no_real_tutor_home`) removes `TUTOR_HOME` from the environment for every test, so exporting it for real use cannot send tests (or their subprocesses) to your real home.
 
 ---
 
@@ -118,4 +119,4 @@ from tutor.subjects import load_subject
 
 ---
 
-*Last updated: 2026-10-12 — unreliable-minutes flag (test_sessionlog.py, test_report.py); earlier: Think about lines (test_subjects.py) and the reply-first turn-order rule (test_package_hygiene.py); earlier: dry-run auto-delete on `review --rehearsal` with `--save-session` (test_cli.py, test_end_to_end.py); earlier: added delete/reset, the dry-run sheet, prepared pictures and Draw it diagrams (pack format, sandbox copy, hygiene checks), transcript saving (test_transcript.py, review/--saveTranscript cases), docs-drift tests and the vector lesson check.*
+*Last updated: 2026-10-14 — autouse `no_real_tutor_home` fixture so an exported TUTOR_HOME cannot redirect tests (conftest.py, test_paths.py); earlier: workspace exit-code check and unmarked-code warning (test_report.py, test_cli.py, test_package_hygiene.py); earlier: unreliable-minutes flag (test_sessionlog.py, test_report.py); earlier: Think about lines (test_subjects.py) and the reply-first turn-order rule (test_package_hygiene.py); earlier: dry-run auto-delete on `review --rehearsal` with `--save-session` (test_cli.py, test_end_to_end.py); earlier: added delete/reset, the dry-run sheet, prepared pictures and Draw it diagrams (pack format, sandbox copy, hygiene checks), transcript saving (test_transcript.py, review/--saveTranscript cases), docs-drift tests and the vector lesson check.*

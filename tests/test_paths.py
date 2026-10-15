@@ -1,4 +1,5 @@
 """Tests for tutor.paths: creating and locating a home, and the sandbox path rules."""
+import os
 from pathlib import Path
 
 import pytest
@@ -77,3 +78,7 @@ def test_a_home_without_its_empty_folders_still_works(home, adam, now):
     assert "physics" in available_subjects(home)
     built = render_sandbox(home, adam, load_subject(home, "physics"), rehearsal=False, now=now)
     assert (built / "SKILL.md").is_file()
+
+
+def test_tests_never_see_a_real_tutor_home():
+    assert ENV_VAR not in os.environ  # the autouse fixture in conftest.py removed it, even if the parent exported one

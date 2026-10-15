@@ -212,3 +212,14 @@ def test_the_tutor_is_told_to_reply_first_and_log_afterwards(sandbox):
     assert "never ask about it afterwards, never score it" in skill
     assert "read it before anything else" in skill
     assert "Do this after you have sent your reply, not before" in skill
+
+
+def test_the_exit_step_covers_a_workspace_check_and_the_write_back(sandbox):
+    from tutor.codes import CODES_FILE
+
+    skill = (sandbox / "SKILL.md").read_text(encoding="utf-8")
+    assert "If you can run shell commands in this folder" in skill
+    assert f"copy only `tutor_sandbox.pyz` and `{CODES_FILE}`" in skill
+    assert f"copy the updated `{CODES_FILE}` back over the one in this folder **before doing anything else**" in skill
+    assert f"Never open, print or describe the contents of `{CODES_FILE}`" in skill
+    assert "I could not mark it as used" in skill
